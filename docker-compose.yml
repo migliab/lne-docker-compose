@@ -1,0 +1,136 @@
+version: '3'
+services:
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      default:
+        ipv4_address: 172.18.0.200
+    ports:
+      - 3306:3306
+    volumes:
+      - c:/code/lnenvios/mysql/:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      default:
+        ipv4_address: 172.18.0.201
+    ports:
+      - 8080:8080
+    links:
+      - mysql:db
+  passport:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.2
+        aliases:
+          - lne-passport.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-passport.vm
+    volumes:
+      - c:/code/lnenvios/passport/:/app/
+  api:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
+        aliases:
+          - lne-api.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-api.vm
+    volumes:
+      - c:/code/lnenvios/api/:/app/
+  got:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.4
+        aliases:
+          - lne-got.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-got.vm
+    volumes:
+      - c:/code/lnenvios/got/:/app/
+  gpde:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.5
+        aliases:
+          - lne-gpde.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-gpde.vm
+    volumes:
+      - c:/code/lnenvios/gpde/:/app/
+  gven:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.6
+        aliases:
+          - lne-gven.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-gven.vm
+    volumes:
+      - c:/code/lnenvios/gven/:/app/
+  notificaciones:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.7
+        aliases:
+          - lne-notificaciones.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-notificaciones.vm
+    volumes:
+      - c:/code/lnenvios/notificaciones/:/app/
+  queue:
+    image: webdevops/php-nginx:7.0
+    networks:
+      default:
+        ipv4_address: 172.18.0.8
+        aliases:
+          - lne-queue.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-queue.vm
+    volumes:
+      - c:/code/lnenvios/queue/:/app/
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
