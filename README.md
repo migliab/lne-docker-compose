@@ -1,7 +1,6 @@
 # lne-docker-compose
 
-## HOSTS
-
+### /etc/hosts
 ```
 172.18.0.2  lne-passport.vm
 172.18.0.3  lne-api.vm
