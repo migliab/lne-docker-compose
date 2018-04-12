@@ -9,4 +9,5 @@
 172.18.0.6  lne-gven.vm
 172.18.0.7  lne-notificaciones.vm
 172.18.0.8  lne-queue.vm
+172.18.0.201  lne-phpmyadmin.vm
 ```
