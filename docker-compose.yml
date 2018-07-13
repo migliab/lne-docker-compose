@@ -1,29 +1,59 @@
-version: '3'
+version: '3.1'
 services:
   mysql:
-    image: mysql
+    image: mysql:5.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: secret
     networks:
       default:
         ipv4_address: 172.18.0.200
-    ports:
-      - 3306:3306
+    expose:
+      - 3306
     volumes:
-      - c:/code/lnenvios/mysql/:/var/lib/mysql
+      - mysql:/var/lib/mysql
+  mongo:
+    image: mongo
+    restart: always
+    networks:
+      default:
+        ipv4_address: 172.18.0.203
+    volumes:
+      - mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+  mongo-express:
+    image: mongo-express
+    restart: always
+    networks:
+      default:
+        ipv4_address: 172.18.0.204
+    expose:
+      - 8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+  redis:
+    image: redis
+    restart: always
+    networks: 
+      default:
+        ipv4_address: 172.18.0.202
+    expose:
+      - 6379
   adminer:
     image: adminer
     restart: always
     networks:
       default:
         ipv4_address: 172.18.0.201
-    ports:
-      - 8080:8080
+    expose:
+      - 8080
     links:
       - mysql:db
   passport:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-PASSPORT
     networks:
       default:
         ipv4_address: 172.18.0.2
@@ -36,9 +66,9 @@ services:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-passport.vm
     volumes:
-      - c:/code/lnenvios/passport/:/app/
+      - c:/code/hop/LNEnvios-PASSPORT/:/app/
   api:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-API
     networks:
       default:
         ipv4_address: 172.18.0.3
@@ -51,9 +81,9 @@ services:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-api.vm
     volumes:
-      - c:/code/lnenvios/api/:/app/
+      - c:/code/hop/LNEnvios-API/:/app/
   got:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-GOT
     networks:
       default:
         ipv4_address: 172.18.0.4
@@ -66,9 +96,9 @@ services:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-got.vm
     volumes:
-      - c:/code/lnenvios/got/:/app/
+      - c:/code/hop/LNEnvios-GOT/:/app/
   gpde:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-GPDE
     networks:
       default:
         ipv4_address: 172.18.0.5
@@ -80,10 +110,19 @@ services:
     environment:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-gpde.vm
+      - XDEBUG_REMOTE_AUTOSTART=1
     volumes:
-      - c:/code/lnenvios/gpde/:/app/
+      - c:/code/hop/LNEnvios-GPDE/:/app/
+  gpde-phpunit:
+    build: LNEnvios-GPDE
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-gpde.vm
+      - XDEBUG_REMOTE_AUTOSTART=1
+    volumes:
+      - c:/code/hop/LNEnvios-GPDE/:/app/
   gven:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-GVEN
     networks:
       default:
         ipv4_address: 172.18.0.6
@@ -96,9 +135,9 @@ services:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-gven.vm
     volumes:
-      - c:/code/lnenvios/gven/:/app/
+      - c:/code/hop/LNEnvios-GVEN/:/app/
   notificaciones:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-NOTIFICACIONES
     networks:
       default:
         ipv4_address: 172.18.0.7
@@ -111,9 +150,9 @@ services:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-notificaciones.vm
     volumes:
-      - c:/code/lnenvios/notificaciones/:/app/
+      - c:/code/hop/LNEnvios-NOTIFICACIONES/:/app/
   queue:
-    image: webdevops/php-nginx:7.0
+    build: LNEnvios-QUEUE
     networks:
       default:
         ipv4_address: 172.18.0.8
@@ -126,7 +165,22 @@ services:
       - WEB_DOCUMENT_ROOT=/app/public
       - WEB_ALIAS_DOMAIN=lne-queue.vm
     volumes:
-      - c:/code/lnenvios/queue/:/app/
+      - c:/code/hop/LNEnvios-QUEUE/:/app/
+  mime:
+    build: LNEnvios-MIME
+    networks:
+      default:
+        ipv4_address: 172.18.0.9
+        aliases:
+          - lne-mime.vm
+    ports:
+      - 80
+      - 443
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - WEB_ALIAS_DOMAIN=lne-mime.vm
+    volumes:
+      - c:/code/hop/LNEnvios-MIME/:/app/
 networks:
   default:
     driver: bridge
@@ -134,3 +188,8 @@ networks:
       driver: default
       config:
         - subnet: 172.18.0.0/16
+volumes:
+  mongo:
+    driver: local
+  mysql:
+    driver: local
